@@ -19,14 +19,14 @@
 	requirejs.config({
 		waitSeconds: 300,
 		paths: {
-			browserfs: ['https://emupedia.net/beta/emuos/js/libraries/browserfs-1.4.3.min', 'https://emuos.net/beta/emuos/js/libraries/browserfs-1.4.3.min'],
-			dropbox: ['https://emupedia.net/beta/emuos/js/libraries/dropbox-4.0.30.min', 'https://emuos.net/beta/emuos/js/libraries/dropbox-4.0.30.min'],
-			simplestorage: ['https://emupedia.net/beta/emuos/js/libraries/simplestorage-0.2.1.min', 'https://emuos.net/beta/emuos/js/libraries/simplestorage-0.2.1.min'],
-			es6promise: ['https://emupedia.net/beta/emuos/js/polyfills/es6-promise-auto-4.2.8.min', 'https://emuos.net/beta/emuos/js/polyfills/es6-promise-auto-4.2.8.min'],
-			es6fetch: ['https://emupedia.net/beta/emuos/js/polyfills/es6-fetch-3.0.0', 'https://emuos.net/beta/emuos/js/polyfills/es6-fetch-3.0.0'],
-			jquery: ['https://emupedia.net/beta/emuos/js/libraries/jquery-3.4.1.min', 'https://emuos.net/beta/emuos/js/libraries/jquery-3.4.1.min'],
-			json: ['https://emupedia.net/beta/emuos/js/libraries/requirejs-json-1.0.3', 'https://emuos.net/beta/emuos/js/libraries/requirejs-json-1.0.3'],
-			text: ['https://emupedia.net/beta/emuos/js/libraries/requirejs-text-2.0.15', 'https://emuos.net/beta/emuos/js/libraries/requirejs-text-2.0.15']
+			browserfs: ['/beta/emuos/js/libraries/browserfs-1.4.3.min', 'https://emupedia.net/beta/emuos/js/libraries/browserfs-1.4.3.min', 'https://emuos.net/beta/emuos/js/libraries/browserfs-1.4.3.min'],
+			dropbox: ['/beta/emuos/js/libraries/dropbox-4.0.30.min', 'https://emupedia.net/beta/emuos/js/libraries/dropbox-4.0.30.min', 'https://emuos.net/beta/emuos/js/libraries/dropbox-4.0.30.min'],
+			simplestorage: ['/beta/emuos/js/libraries/simplestorage-0.2.1.min', 'https://emupedia.net/beta/emuos/js/libraries/simplestorage-0.2.1.min', 'https://emuos.net/beta/emuos/js/libraries/simplestorage-0.2.1.min'],
+			es6promise: ['/beta/emuos/js/polyfills/es6-promise-auto-4.2.8.min', 'https://emupedia.net/beta/emuos/js/polyfills/es6-promise-auto-4.2.8.min', 'https://emuos.net/beta/emuos/js/polyfills/es6-promise-auto-4.2.8.min'],
+			es6fetch: ['/beta/emuos/js/polyfills/es6-fetch-3.0.0', 'https://emupedia.net/beta/emuos/js/polyfills/es6-fetch-3.0.0', 'https://emuos.net/beta/emuos/js/polyfills/es6-fetch-3.0.0'],
+			jquery: ['/beta/emuos/js/libraries/jquery-3.4.1.min', 'https://emupedia.net/beta/emuos/js/libraries/jquery-3.4.1.min', 'https://emuos.net/beta/emuos/js/libraries/jquery-3.4.1.min'],
+			json: ['/beta/emuos/js/libraries/requirejs-json-1.0.3', 'https://emupedia.net/beta/emuos/js/libraries/requirejs-json-1.0.3', 'https://emuos.net/beta/emuos/js/libraries/requirejs-json-1.0.3'],
+			text: ['/beta/emuos/js/libraries/requirejs-text-2.0.15', 'https://emupedia.net/beta/emuos/js/libraries/requirejs-text-2.0.15', 'https://emuos.net/beta/emuos/js/libraries/requirejs-text-2.0.15']
 		},
 		shim: {
 			browserfs: {
