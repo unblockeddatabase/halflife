@@ -24,7 +24,7 @@
 			simplestorage: ['/beta/emuos/js/libraries/simplestorage-0.2.1.min', 'https://emupedia.net/beta/emuos/js/libraries/simplestorage-0.2.1.min', 'https://emuos.net/beta/emuos/js/libraries/simplestorage-0.2.1.min'],
 			es6promise: ['/beta/emuos/js/libraries/polyfill-es6-promise-auto-4.2.8.min', 'https://emupedia.net/beta/emuos/js/libraries/polyfill-es6-promise-auto-4.2.8.min', 'https://emuos.net/beta/emuos/js/libraries/polyfill-es6-promise-auto-4.2.8.min'],
 			es6fetch: ['/beta/emuos/js/libraries/polyfill-es6-fetch-3.0.0', 'https://emupedia.net/beta/emuos/js/libraries/polyfill-es6-fetch-3.0.0', 'https://emuos.net/beta/emuos/js/libraries/polyfill-es6-fetch-3.0.0'],
-			jquery: ['/beta/emuos/js/libraries/jquery-3.4.1.min', 'https://emupedia.net/beta/emuos/js/libraries/jquery-3.4.1.min', 'https://emuos.net/beta/emuos/js/libraries/jquery-3.4.1.min'],
+			jquery: ['/beta/emuos/js/libraries/jquery-3.5.0.min', 'https://emupedia.net/beta/emuos/js/libraries/jquery-3.5.0.min', 'https://emuos.net/beta/emuos/js/libraries/jquery-3.5.0.min'],
 			json: ['/beta/emuos/js/libraries/requirejs-json-1.0.3', 'https://emupedia.net/beta/emuos/js/libraries/requirejs-json-1.0.3', 'https://emuos.net/beta/emuos/js/libraries/requirejs-json-1.0.3'],
 			text: ['/beta/emuos/js/libraries/requirejs-text-2.0.15', 'https://emupedia.net/beta/emuos/js/libraries/requirejs-text-2.0.15', 'https://emuos.net/beta/emuos/js/libraries/requirejs-text-2.0.15']
 		},
