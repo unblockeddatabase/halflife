@@ -39,8 +39,6 @@ if (typeof btoa === 'undefined') {
 
 // endregion
 
-window['DROPBOX_TOKEN']			= atob('UncxWEJoSHQzYUFBQUFBQUFBQURZX203TElMaGFfUjFad1dLLWJtcFRDYW5qVmFnM25aQUh6SUotM2JzRnByWQ==');
-
 (function() {
 	var externallyFramed;
 
