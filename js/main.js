@@ -11,6 +11,7 @@
 	var $container						= null;
 	var $canvas							= null;
 	var $progress						= null;
+	var dbx								= null;
 	var video							= null;
 	var multiplayer						= false;
 
@@ -19,7 +20,6 @@
 		waitSeconds: 300,
 		paths: {
 			browserfs: 'libraries/browserfs-1.4.3.min',
-			megajs: 'libraries/megajs-0.17.2',
 			dropbox: 'libraries/dropbox-4.0.30.min',
 			simplestorage: 'libraries/simplestorage-0.2.1.min',
 			es6promise: 'libraries/polyfill-es6-promise-auto-4.2.8.min',
@@ -38,9 +38,6 @@
 			},
 			es6promise: {
 				exports: 'Promise'
-			},
-			megajs: {
-				exports: 'mega'
 			}
 		}
 	});
@@ -49,10 +46,10 @@
 	requirejs([
 		'jquery',
 		'browserfs',
-		'megajs',
+		'dropbox',
 		'es6fetch',
 		'simplestorage'
-	], function($, BrowserFS, mega, fetch, simplestorage) {
+	], function($, BrowserFS, dropbox, fetch, simplestorage) {
 		// noinspection DuplicatedCode
 		$(function() {
 			$document	= $(document);
@@ -63,6 +60,8 @@
 			$canvas		= $('div.fullscreen');
 			$progress	= $body.find('progress').first();
 			// noinspection JSUnresolvedFunction
+			dbx			= new dropbox.Dropbox({accessToken: window['DROPBOX_TOKEN'], fetch: fetch.fetch});
+
 			(function() {
 				if (typeof simplestorage.get('intro') === 'undefined') {
 					video = $('<video />', {
@@ -158,7 +157,6 @@
 				mfs.mount('/zip', new BrowserFS.FileSystem.ZipFS(Buffer.from(data)));
 
 				try {
-					// noinspection JSUnresolvedVariable
 					FS.mount(new BrowserFS.EmscriptenFS(), {root: '/zip'}, '/rodir');
 				} catch (e) {
 					var canvas = $('<canvas/>', {
@@ -168,56 +166,44 @@
 
 					$canvas.html('').append(canvas).hide();
 
-					// noinspection JSUnresolvedVariable,JSUnresolvedFunction
 					FS.unmount('/rodir');
-					// noinspection JSUnresolvedVariable
 					FS.mount(new BrowserFS.EmscriptenFS(), {root: '/zip'}, '/rodir');
 				}
 			}
 
 			function fetchZIP(packageName, cb) {
-				console.log(packageName);
-
 				$progress.css({
 					visibility: 'visible'
 				});
 
-				var link = '';
+				dbx.filesGetTemporaryLink({path: '/halflife1/' + packageName}).then(function (response) {
+					var xhr = new XMLHttpRequest();
+					xhr.open('GET', response.link, true);
+					xhr.responseType = 'arraybuffer';
+					xhr.onprogress = function (event) {
+						// noinspection JSUnusedLocalSymbols
+						var percentComplete = event.loaded / event.total * 100;
+						if (Module['setStatus']) Module['setStatus']('Downloading data... (' + event.loaded + '/' + event.total + ')');
+					};
+					// noinspection DuplicatedCode,JSUnusedLocalSymbols
+					xhr.onload = function (event) {
+						if (xhr.status === 200 || xhr.status === 304 || xhr.status === 206 || (xhr.status === 0 && xhr.response)) {
+							mountZIP(xhr.response);
+							$progress.css({
+								visibility: 'hidden'
+							});
 
-				switch (packageName) {
-					case 'dayone.zip':
-						link = 'https://mega.nz/file/BMEkQByB#ZP_vNxkqvOu8Vsgryh_YRlEXgzk433Vyw7HxhNWGqq4';
-						break;
-					case 'hc.zip':
-						link = 'https://mega.nz/file/YFNWmbRQ#AXp0fKCG0y-3k1VKJLdjT-IjrYd4v_8G3JVVRxMCLa8';
-						break;
-					case 'hl.zip':
-						link = 'https://mega.nz/file/YFNWmbRQ#AXp0fKCG0y-3k1VKJLdjT-IjrYd4v_8G3JVVRxMCLa8';
-						break;
-					case 'hldm.zip':
-						link = 'https://mega.nz/file/RQ8njQIQ#jjrJpmJfBJ3RhVrgp8ntwmxw4Ofxo-uRXE76yYRu3QA';
-						break;
-					case 'uplink.zip':
-						link = 'https://mega.nz/file/AZtDCI6A#sAfEYmV3QWk5bGs6n_7Ol5Vq5HtuUgj9a_Hrre8xx_E';
-						break;
-				}
-
-				// noinspection JSUnresolvedFunction
-				var file = mega.File.fromURL(link);
-
-				// noinspection JSUnresolvedFunction
-				file.loadAttributes(function(error, file) {
-					file.download(function (err, data) {
-						if (err) throw err
-						mountZIP(data);
-						$progress.css({
-							visibility: 'hidden'
-						});
-
-						$canvas.show();
-						cb();
-					})
-				})
+							$canvas.show();
+							cb();
+						} else {
+							throw new Error(xhr.statusText + " : " + xhr.responseURL);
+						}
+					};
+					xhr.setRequestHeader('X-File-Name', packageName);
+					xhr.send(null);
+				}).catch(function (error) {
+					console.log(error);
+				});
 			}
 
 			function init() {
