@@ -12,6 +12,7 @@
 	var $canvas							= null;
 	var $progress						= null;
 	var dbx								= null;
+	var path							= null;
 	var video							= null;
 	var multiplayer						= false;
 
@@ -61,12 +62,13 @@
 			$progress	= $body.find('progress').first();
 			// noinspection JSUnresolvedFunction
 			dbx			= new dropbox.Dropbox({accessToken: window['DROPBOX_TOKEN'], fetch: fetch.fetch});
+			path		= (window.location.hostname !== 'localhost' ? '//' + window.location.hostname : 'https://emupedia.net') + '/emupedia-data-halflife1/';
 
 			(function() {
 				if (typeof simplestorage.get('intro') === 'undefined') {
 					video = $('<video />', {
 						class: 'fullscreen',
-						src: 'media/sierra.mp4',
+						src: path + 'media/sierra.mp4',
 						type: 'video/mp4',
 						preload: 'auto',
 						autoplay: true
@@ -74,12 +76,12 @@
 
 					// noinspection DuplicatedCode
 					$(video).off('ended').one('ended', function() {
-						$(video).attr('src', 'media/valve.mp4');
+						$(video).attr('src', path + 'media/valve.mp4');
 						$(video).off('ended').one('ended', function() {
 							$(video).remove();
 
 							video = $('<video />', {
-								src: 'media/logo.mp4',
+								src: path + 'media/logo.mp4',
 								type: 'video/mp4',
 								preload: 'auto',
 								autoplay: true,
@@ -91,12 +93,12 @@
 							$container.find('.logo').append(video);
 						});
 					}).off('click').one('click', function() {
-						$(video).attr('src', 'media/valve.mp4');
+						$(video).attr('src', path + 'media/valve.mp4');
 						$(video).off('click').one('click', function() {
 							$(video).remove();
 
 							video = $('<video />', {
-								src: 'media/logo.mp4',
+								src: path + 'media/logo.mp4',
 								type: 'video/mp4',
 								preload: 'auto',
 								autoplay: true,
@@ -112,7 +114,7 @@
 					$container.prepend(video);
 				} else {
 					video = $('<video />', {
-						src: 'media/logo.mp4',
+						src: path + 'media/logo.mp4',
 						type: 'video/mp4',
 						preload: 'auto',
 						autoplay: true,
@@ -177,7 +179,7 @@
 				});
 
 				var xhr = new XMLHttpRequest();
-				xhr.open('GET', (window.location.hostname !== 'localhost' ? '//' + window.location.hostname : 'https://emupedia.net') + '/emupedia-data-halflife1/' + packageName, true);
+				xhr.open('GET', path + packageName, true);
 				xhr.responseType = 'arraybuffer';
 				xhr.onprogress = function (event) {
 					// noinspection JSUnusedLocalSymbols
