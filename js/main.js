@@ -217,7 +217,7 @@
 			}
 
 			function initEvents() {
-				$container.find('.menu button').removeAttr('disabled');
+				$container.find('.menu button.hc, .menu button.uplink, .menu button.dayone, .menu button.hldm').removeAttr('disabled');
 
 				$document.off('click', '.menu button').on('click', '.menu button', function() {
 					if (!$(this).is('[disabled]')) {
