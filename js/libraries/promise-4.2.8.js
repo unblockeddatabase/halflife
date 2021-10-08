@@ -516,7 +516,7 @@ var Enumerator = function () {
       } else if (typeof _then !== 'function') {
         this._remaining--;
         this._result[i] = entry;
-      } else if (c === Promise$2) {
+      } else if (c === Promise$1) {
         var promise = new c(noop);
         if (didError) {
           reject(promise, error);
@@ -854,7 +854,7 @@ function needsNew() {
   @constructor
 */
 
-var Promise$2 = function () {
+var Promise$1 = function () {
   function Promise(resolver) {
     this[PROMISE_ID] = nextId();
     this._result = this._state = undefined;
@@ -1118,14 +1118,14 @@ var Promise$2 = function () {
   return Promise;
 }();
 
-Promise$2.prototype.then = then;
-Promise$2.all = all;
-Promise$2.race = race;
-Promise$2.resolve = resolve$1;
-Promise$2.reject = reject$1;
-Promise$2._setScheduler = setScheduler;
-Promise$2._setAsap = setAsap;
-Promise$2._asap = asap;
+Promise$1.prototype.then = then;
+Promise$1.all = all;
+Promise$1.race = race;
+Promise$1.resolve = resolve$1;
+Promise$1.reject = reject$1;
+Promise$1._setScheduler = setScheduler;
+Promise$1._setAsap = setAsap;
+Promise$1._asap = asap;
 
 /*global self*/
 function polyfill() {
@@ -1158,19 +1158,17 @@ function polyfill() {
     }
   }
 
-  local.Promise = Promise$2;
+  local.Promise = Promise$1;
 }
 
 // Strange compat..
-Promise$2.polyfill = polyfill;
-Promise$2.Promise = Promise$2;
+Promise$1.polyfill = polyfill;
+Promise$1.Promise = Promise$1;
 
-Promise$2.polyfill();
-
-return Promise$2;
+return Promise$1;
 
 })));
 
 
 
-//# sourceMappingURL=es6-promise.auto.map
+//# sourceMappingURL=es6-promise.map
