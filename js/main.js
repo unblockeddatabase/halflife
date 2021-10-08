@@ -176,35 +176,30 @@
 					visibility: 'visible'
 				});
 
-				dbx.filesDownload({path: '/halflife1/' + packageName}).then(function (response) {
-					console.log(response);
-					var xhr = new XMLHttpRequest();
-					xhr.open('GET', URL.createObjectURL(response.result.fileBlob), true);
-					xhr.responseType = 'arraybuffer';
-					xhr.onprogress = function (event) {
-						// noinspection JSUnusedLocalSymbols
-						var percentComplete = event.loaded / event.total * 100;
-						if (Module['setStatus']) Module['setStatus']('Downloading data... (' + event.loaded + '/' + event.total + ')');
-					};
-					// noinspection DuplicatedCode,JSUnusedLocalSymbols
-					xhr.onload = function (event) {
-						if (xhr.status === 200 || xhr.status === 304 || xhr.status === 206 || (xhr.status === 0 && xhr.response)) {
-							mountZIP(xhr.response);
-							$progress.css({
-								visibility: 'hidden'
-							});
+				var xhr = new XMLHttpRequest();
+				xhr.open('GET', (window.location.hostname !== 'localhost' ? '//' + window.location.hostname : 'https://emupedia.net') + '/emupedia-data-halflife1/' + packageName, true);
+				xhr.responseType = 'arraybuffer';
+				xhr.onprogress = function (event) {
+					// noinspection JSUnusedLocalSymbols
+					var percentComplete = event.loaded / event.total * 100;
+					if (Module['setStatus']) Module['setStatus']('Downloading data... (' + event.loaded + '/' + event.total + ')');
+				};
+				// noinspection DuplicatedCode,JSUnusedLocalSymbols
+				xhr.onload = function (event) {
+					if (xhr.status === 200 || xhr.status === 304 || xhr.status === 206 || (xhr.status === 0 && xhr.response)) {
+						mountZIP(xhr.response);
+						$progress.css({
+							visibility: 'hidden'
+						});
 
-							$canvas.show();
-							cb();
-						} else {
-							throw new Error(xhr.statusText + " : " + xhr.responseURL);
-						}
-					};
-					xhr.setRequestHeader('X-File-Name', packageName);
-					xhr.send(null);
-				}).catch(function (error) {
-					console.log(error);
-				});
+						$canvas.show();
+						cb();
+					} else {
+						throw new Error(xhr.statusText + " : " + xhr.responseURL);
+					}
+				};
+				xhr.setRequestHeader('X-File-Name', packageName);
+				xhr.send(null);
 			}
 
 			function init() {
