@@ -313,7 +313,7 @@
 						}
 					},
 					websocket: {
-						url: 'wsproxy://ws.emupedia.net:2000/'
+						url: 'wsproxy://ws2.emupedia.net:2000/'
 					}
 				};
 				window.ENV = {};
