@@ -159,6 +159,7 @@
 				mfs.mount('/zip', new BrowserFS.FileSystem.ZipFS(Buffer.from(data)));
 
 				try {
+					// noinspection JSUnresolvedVariable
 					FS.mount(new BrowserFS.EmscriptenFS(), {root: '/zip'}, '/rodir');
 				} catch (e) {
 					var canvas = $('<canvas/>', {
@@ -167,8 +168,9 @@
 					});
 
 					$canvas.html('').append(canvas).hide();
-
+					// noinspection JSUnresolvedVariable,JSUnresolvedFunction
 					FS.unmount('/rodir');
+					// noinspection JSUnresolvedVariable
 					FS.mount(new BrowserFS.EmscriptenFS(), {root: '/zip'}, '/rodir');
 				}
 			}
