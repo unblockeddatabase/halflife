@@ -20,11 +20,11 @@
 		waitSeconds: 300,
 		paths: {
 			browserfs: 'libraries/browserfs-1.4.3.min',
-			dropbox: 'libraries/dropbox-4.0.30.min',
+			dropbox: 'libraries/dropbox-10.11.0.min',
 			simplestorage: 'libraries/simplestorage-0.2.1.min',
-			es6promise: 'libraries/polyfill-es6-promise-auto-4.2.8.min',
-			es6fetch: 'libraries/polyfill-es6-fetch-3.0.0',
-			jquery: 'libraries/jquery-3.5.0.min',
+			es6promise: 'libraries/promise-4.2.8.min',
+			es6fetch: 'libraries/fetch-3.6.2',
+			jquery: 'libraries/jquery-3.6.0.min',
 			json: 'libraries/requirejs-json-1.0.3',
 			text: 'libraries/requirejs-text-2.0.15'
 		},
@@ -176,9 +176,10 @@
 					visibility: 'visible'
 				});
 
-				dbx.filesGetTemporaryLink({path: '/halflife1/' + packageName}).then(function (response) {
+				dbx.filesDownload({path: '/halflife1/' + packageName}).then(function (response) {
+					console.log(response);
 					var xhr = new XMLHttpRequest();
-					xhr.open('GET', response.link, true);
+					xhr.open('GET', URL.createObjectURL(response.result.fileBlob), true);
 					xhr.responseType = 'arraybuffer';
 					xhr.onprogress = function (event) {
 						// noinspection JSUnusedLocalSymbols
