@@ -11,7 +11,6 @@
 	var $container						= null;
 	var $canvas							= null;
 	var $progress						= null;
-	var dbx								= null;
 	var path							= null;
 	var video							= null;
 	var multiplayer						= false;
@@ -21,7 +20,6 @@
 		waitSeconds: 300,
 		paths: {
 			browserfs: 'libraries/browserfs-1.4.3.min',
-			dropbox: 'libraries/dropbox-10.11.0.min',
 			simplestorage: 'libraries/simplestorage-0.2.1.min',
 			es6promise: 'libraries/promise-4.2.8.min',
 			es6fetch: 'libraries/fetch-3.6.2',
@@ -47,10 +45,9 @@
 	requirejs([
 		'jquery',
 		'browserfs',
-		'dropbox',
 		'es6fetch',
 		'simplestorage'
-	], function($, BrowserFS, dropbox, fetch, simplestorage) {
+	], function($, BrowserFS, fetch, simplestorage) {
 		// noinspection DuplicatedCode
 		$(function() {
 			$document	= $(document);
@@ -60,9 +57,7 @@
 			$container	= $('.container');
 			$canvas		= $('div.fullscreen');
 			$progress	= $body.find('progress').first();
-			// noinspection JSUnresolvedFunction
-			dbx			= new dropbox.Dropbox({accessToken: window['DROPBOX_TOKEN'], fetch: fetch.fetch});
-			path		= (window.location.hostname !== 'localhost' ? '//' + window.location.hostname : 'https://emupedia.net') + '/emupedia-data-halflife1/';
+			path		= window.location.hostname !== 'localhost' ? '//' + window.location.hostname + '/emupedia-data-halflife1/' : 'data/';
 
 			(function() {
 				if (typeof simplestorage.get('intro') === 'undefined') {
@@ -136,7 +131,6 @@
 
 			var moduleCount = 0;
 			var run = null;
-			var mfs = null;
 
 			function loadModule(name) {
 				var script = document.createElement('script');
@@ -153,35 +147,13 @@
 				script.src = name + '.js';
 			}
 
-			function mountZIP(data) {
-				var Buffer = BrowserFS.BFSRequire('buffer').Buffer;
-				// noinspection JSUnresolvedFunction
-				mfs.mount('/zip', new BrowserFS.FileSystem.ZipFS(Buffer.from(data)));
-
-				try {
-					// noinspection JSUnresolvedVariable
-					FS.mount(new BrowserFS.EmscriptenFS(), {root: '/zip'}, '/rodir');
-				} catch (e) {
-					var canvas = $('<canvas/>', {
-						id: 'canvas',
-						oncontextmenu: 'event.preventDefault()'
-					});
-
-					$canvas.html('').append(canvas).hide();
-					// noinspection JSUnresolvedVariable,JSUnresolvedFunction
-					FS.unmount('/rodir');
-					// noinspection JSUnresolvedVariable
-					FS.mount(new BrowserFS.EmscriptenFS(), {root: '/zip'}, '/rodir');
-				}
-			}
-
-			function fetchZIP(packageName, cb) {
+			function fetchZIP(zip, cb) {
 				$progress.css({
 					visibility: 'visible'
 				});
 
 				var xhr = new XMLHttpRequest();
-				xhr.open('GET', path + packageName, true);
+				xhr.open('GET', path + zip, true);
 				xhr.responseType = 'arraybuffer';
 				xhr.onprogress = function (event) {
 					// noinspection JSUnusedLocalSymbols
@@ -191,18 +163,21 @@
 				// noinspection DuplicatedCode,JSUnusedLocalSymbols
 				xhr.onload = function (event) {
 					if (xhr.status === 200 || xhr.status === 304 || xhr.status === 206 || (xhr.status === 0 && xhr.response)) {
-						mountZIP(xhr.response);
 						$progress.css({
 							visibility: 'hidden'
 						});
 
 						$canvas.show();
-						cb();
+
+						if (typeof cb === 'function') {
+							cb(xhr.response);
+						}
 					} else {
 						throw new Error(xhr.statusText + " : " + xhr.responseURL);
 					}
 				};
-				xhr.setRequestHeader('X-File-Name', packageName);
+
+				xhr.setRequestHeader('X-File-Name', zip);
 				xhr.send(null);
 			}
 
@@ -219,7 +194,7 @@
 			}
 
 			function initEvents() {
-				$container.find('.menu button.hc, .menu button.uplink, .menu button.dayone, .menu button.hldm').removeAttr('disabled');
+				$container.find('.menu button').removeAttr('disabled');
 
 				$document.off('click', '.menu button').on('click', '.menu button', function() {
 					if (!$(this).is('[disabled]')) {
@@ -238,15 +213,19 @@
 
 			function start(game) {
 				try {
-					window.FS.mkdir('/rodir');
-					window.FS.mkdir('/xash');
+					// noinspection JSUnresolvedVariable
+					FS.mkdir('/rodir');
+					// noinspection JSUnresolvedVariable
+					FS.mkdir('/rodir/valve');
+					// noinspection JSUnresolvedVariable
+					FS.mkdir('/rodir/valve/maps');
+					// noinspection JSUnresolvedVariable
+					FS.mkdir('/xash');
+					// noinspection JSUnresolvedVariable
+					FS.chdir('/xash/');
 				} catch (e) {}
 
-				mfs = new BrowserFS.FileSystem.MountableFileSystem();
-				BrowserFS.initialize(mfs);
-				window.FS.chdir('/xash/');
-
-				switch(game) {
+				switch (game) {
 					case 'hc':
 						window.Module.arguments = ['-dev', '1', '+sv_cheats', '1', '+map', 't0a0'];
 						break;
@@ -257,6 +236,7 @@
 						window.Module.arguments = ['-dev', '1', '+sv_cheats', '1', '+map', 'c0a0'];
 						break;
 					case 'hl':
+					case 'hl1':
 						window.Module.arguments = ['-dev', '1', '+sv_cheats', '1', '+map', 'c0a0'];
 						break;
 					case 'hldm':
@@ -266,7 +246,55 @@
 				}
 
 				window.Module.run = window.run = run;
-				fetchZIP(game + '.zip', run);
+
+				var Buffer = BrowserFS.BFSRequire('buffer').Buffer;
+
+				fetchZIP(game +'.zip', function(data1) {
+					BrowserFS.FileSystem.ZipFS.Create({zipData: Buffer.from(data1)}, function(e, fs1) {
+						if (e !== null) {
+							console.log(e);
+						} else {
+							if (game !== 'hl1') {
+								BrowserFS.FileSystem.MountableFileSystem.Create({
+									'/': fs1
+								}, function(e, mfs) {
+									if (e !== null) {
+										console.log(e)
+									} else {
+										BrowserFS.initialize(mfs);
+										// noinspection JSUnresolvedVariable
+										FS.mount(new BrowserFS.EmscriptenFS(), {root: '/'}, '/rodir');
+										// noinspection JSUnresolvedVariable
+										run();
+									}
+								});
+							} else {
+								fetchZIP('hl1maps.zip', function(data2) {
+									BrowserFS.FileSystem.ZipFS.Create({zipData: Buffer.from(data2)}, function(e, fs2) {
+										if (e !== null) {
+											console.log(e);
+										} else {
+											BrowserFS.FileSystem.MountableFileSystem.Create({
+												'/': fs1,
+												'/valve/maps/': fs2
+											}, function(e, mfs) {
+												if (e !== null) {
+													console.log(e)
+												} else {
+													BrowserFS.initialize(mfs);
+													// noinspection JSUnresolvedVariable
+													FS.mount(new BrowserFS.EmscriptenFS(), {root: '/'}, '/rodir');
+													// noinspection JSUnresolvedVariable
+													run();
+												}
+											});
+										}
+									});
+								});
+							}
+						}
+					});
+				});
 			}
 
 			// noinspection JSUnresolvedVariable
@@ -324,20 +352,18 @@
 					console.log(id);
 				};
 
-				(function() {
-					var memoryInitializer = 'js/xash.html.mem';
+				var memoryInitializer = 'js/xash.html.mem';
 
-					if (typeof Module['locateFile'] === 'function') {
-						memoryInitializer = Module['locateFile'](memoryInitializer);
-					} else if (Module['memoryInitializerPrefixURL']) {
-						memoryInitializer = Module['memoryInitializerPrefixURL'] + memoryInitializer;
-					}
+				if (typeof Module['locateFile'] === 'function') {
+					memoryInitializer = Module['locateFile'](memoryInitializer);
+				} else if (Module['memoryInitializerPrefixURL']) {
+					memoryInitializer = Module['memoryInitializerPrefixURL'] + memoryInitializer;
+				}
 
-					var xhr = Module['memoryInitializerRequest'] = new XMLHttpRequest();
-					xhr.open('GET', memoryInitializer, true);
-					xhr.responseType = 'arraybuffer';
-					xhr.send(null);
-				})();
+				var xhr = Module['memoryInitializerRequest'] = new XMLHttpRequest();
+				xhr.open('GET', memoryInitializer, true);
+				xhr.responseType = 'arraybuffer';
+				xhr.send(null);
 
 				var script = document.createElement('script');
 				script.src = 'js/xash.js';
