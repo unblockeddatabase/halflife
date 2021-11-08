@@ -167,8 +167,6 @@
 							visibility: 'hidden'
 						});
 
-						$canvas.show();
-
 						if (typeof cb === 'function') {
 							cb(xhr.response);
 						}
@@ -265,6 +263,7 @@
 										// noinspection JSUnresolvedVariable
 										FS.mount(new BrowserFS.EmscriptenFS(), {root: '/'}, '/rodir');
 										// noinspection JSUnresolvedVariable
+										$canvas.show();
 										run();
 									}
 								});
@@ -285,6 +284,7 @@
 													// noinspection JSUnresolvedVariable
 													FS.mount(new BrowserFS.EmscriptenFS(), {root: '/'}, '/rodir');
 													// noinspection JSUnresolvedVariable
+													$canvas.show();
 													run();
 												}
 											});

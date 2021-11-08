@@ -1,8 +1,11 @@
 // noinspection DuplicatedCode
 function fetchFromCache(e) {
-	return caches.match(e.request.headers.get('X-File-Name')).then(function(response) {
+	var request = e.request;
+	var filename = request.url.split('/').pop().split('#').shift().split('?').shift() || '';
+
+	return caches.match(filename).then(function(response) {
 		if (!response) {
-			throw Error(e.request.url + ' not found in cache');
+			throw Error(request.url + ' not found in cache');
 		}
 
 		return response;
@@ -12,10 +15,11 @@ function fetchFromCache(e) {
 function addToCache(name, request, response) {
 	if (response.ok) {
 		var content_type = response.headers.get('Content-Type') || '';
-		var filename = request.headers.get('X-File-Name') || '';
+		var filename = request.url.split('/').pop().split('#').shift().split('?').shift() || '';
+		var extension = filename.split('.').pop();
 
-		if (content_type === 'application/zip') {
-			if (filename !== '') {
+		if (content_type === 'application/octet-stream' || content_type === 'application/zip') {
+			if (filename !== '' && extension === 'zip') {
 				var copy = response.clone();
 
 				caches.open(name).then(function(cache) {
@@ -29,28 +33,15 @@ function addToCache(name, request, response) {
 	return response;
 }
 
-self.addEventListener('install', function() {
-	console.log('ServiceWorker Installed!');
-});
-
-self.addEventListener('activate', function() {
-	console.log('ServiceWorker Activated!');
-});
-
-self.addEventListener('message', function(e) {
-	console.log('ServiceWorker: Handling message event: ', e);
-});
-
 self.addEventListener('fetch', function(e) {
-	console.log('ServiceWorkder: Handling fetch event for: ', e.request.url);
+	var request = e.request;
 
-	if (e.request.url.startsWith('https://dl.dropboxusercontent.com')) {
-		var request = e.request;
-
+	// noinspection JSUnresolvedFunction
+	if (request.url.endsWith('zip')) {
 		// noinspection BadExpressionStatementJS
 		e.respondWith(fetchFromCache(e).catch(function() {
 			return fetch(request);
-		}).then(function(response){
+		}).then(function(response) {
 			return addToCache('data', request, response);
 		}));
 	}
